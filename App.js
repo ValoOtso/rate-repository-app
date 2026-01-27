@@ -1,13 +1,19 @@
-/* eslint-disable no-unused-vars */
-import Main from "./src/components/Main";
-import { NativeRouter } from "react-router-native";
+import React from "react";
 import { StatusBar } from "expo-status-bar";
+import { NativeRouter } from "react-router-native";
+import { ApolloProvider } from "@apollo/client";
+import createApolloClient from "./src/utils/apolloClient";
+import Main from "./src/components/Main";
+
+const apolloClient = createApolloClient();
 
 const App = () => {
   return (
     <>
       <NativeRouter>
-        <Main />
+        <ApolloProvider client={apolloClient}>
+          <Main />
+        </ApolloProvider>
       </NativeRouter>
       <StatusBar style="auto" />
     </>
