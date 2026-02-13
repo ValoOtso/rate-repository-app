@@ -1,4 +1,5 @@
-import { View, Image, StyleSheet } from "react-native";
+import { View, Image, StyleSheet, Pressable } from "react-native";
+import { useNavigate } from "react-router-native";
 
 import Text from "./Text";
 
@@ -43,11 +44,26 @@ const styles = StyleSheet.create({
   name: {
     marginBottom: 9,
   },
+  gitButton: {
+    backgroundColor: "blue",
+    borderRadius: 5,
+    margin: 10,
+  },
 });
 
-const RepositoryItem = ({ item }) => {
-  return (
-    <View style={styles.flexContainer}>
+const formatCount = (value) =>
+  value >= 1000
+    ? `${(value / 1000).toFixed(1).replace(".0", "")}k`
+    : String(value);
+
+const RepositoryItem = ({
+  item,
+  onPress,
+  showButton = false,
+  onButtonPress,
+}) => {
+  const content = (
+    <View testID="repositoryItem" style={styles.flexContainer}>
       <View style={styles.flexItemAAndLogo}>
         <Image style={styles.logo} source={{ uri: item.ownerAvatarUrl }} />
         <View style={styles.flexItemA}>
@@ -62,11 +78,11 @@ const RepositoryItem = ({ item }) => {
       </View>
       <View style={styles.flexItemB}>
         <View style={styles.flexItemC}>
-          <Text fontWeight="bold">{item.stargazersCount}</Text>
+          <Text fontWeight="bold">{formatCount(item.stargazersCount)}</Text>
           <Text color="textGrey">Stars</Text>
         </View>
         <View style={styles.flexItemC}>
-          <Text fontWeight="bold">{item.forksCount}</Text>
+          <Text fontWeight="bold">{formatCount(item.forksCount)}</Text>
           <Text color="textGrey">Forks</Text>
         </View>
         <View style={styles.flexItemC}>
@@ -78,8 +94,24 @@ const RepositoryItem = ({ item }) => {
           <Text color="textGrey">Rating</Text>
         </View>
       </View>
+      {showButton && (
+        <Pressable style={styles.gitButton} onPress={onButtonPress}>
+          <Text
+            fontWeight="bold"
+            style={{ color: "white", padding: 10, textAlign: "center" }}
+          >
+            Open in GitHub
+          </Text>
+        </Pressable>
+      )}
     </View>
   );
+
+  if (!onPress) {
+    return content;
+  }
+
+  return <Pressable onPress={onPress}>{content}</Pressable>;
 };
 
 export default RepositoryItem;

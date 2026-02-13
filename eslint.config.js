@@ -31,6 +31,11 @@ export default [
       react,
       "react-native": reactNative,
     },
+    extends: [
+      "eslint:recommended",
+      "plugin:react/recommended",
+      "plugin:jest/recommended",
+    ],
 
     settings: {
       react: {

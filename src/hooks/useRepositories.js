@@ -1,13 +1,16 @@
 import { useQuery } from "@apollo/client";
 import { GET_REPOSITORIES } from "../graphql/queries";
+import { se } from "date-fns/locale";
 
-const useRepositories = () => {
+const useRepositories = (order, orderDirection, searchKeyword) => {
   const { data, loading, error } = useQuery(GET_REPOSITORIES, {
+    variables: {
+      orderDirection: orderDirection,
+      orderBy: order,
+      searchKeyword: searchKeyword,
+    },
     fetchPolicy: "cache-and-network",
   });
-
-  // Logs to confirm the hook runs
-  console.log("useRepositories executed:", { data, loading, error });
 
   return {
     repositories: data?.repositories,

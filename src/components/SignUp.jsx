@@ -2,8 +2,7 @@ import { TextInput, View, Pressable, StyleSheet } from "react-native";
 import Text from "./Text";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import useSignIn from "../hooks/useSignIn";
-import { useEffect } from "react";
+import UseSignUp from "../hooks/useSignUp";
 import useAuthStorage from "../hooks/useAuthStorage";
 import { useNavigate } from "react-router-native";
 
@@ -42,30 +41,24 @@ const styles = StyleSheet.create({
 const validationSchema = yup.object().shape({
   username: yup.string().required("Username is required"),
   password: yup.string().required("Password is required"),
+  passwordConfirmation: yup
+    .string()
+    .oneOf([yup.ref("password"), null])
+    .required("Password confirmation is required"),
 });
 
-const SignIn = () => {
-  const [signIn] = useSignIn();
-  const authStorage = useAuthStorage();
+const SignUp = () => {
+  const [signUp] = UseSignUp();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkToken = async () => {
-      const token = await authStorage.getAccessToken();
-      console.log("Stored access token:", token);
-    };
-
-    checkToken();
-  }, [authStorage]);
 
   const onSubmit = async (values) => {
     const { username, password } = values;
 
-    console.log("SIGN IN SUBMIT ATTEMPT", values);
+    console.log("SIGN UP SUBMIT ATTEMPT", values);
 
     try {
-      const { data } = await signIn({ username, password });
-      console.log(data);
+      const user = await signUp({ username, password });
+      console.log(user);
       navigate("/");
     } catch (e) {
       console.log(e);
@@ -76,26 +69,20 @@ const SignIn = () => {
     initialValues: {
       username: "",
       password: "",
+      passwordConfirmation: "",
     },
     onSubmit,
     validationSchema,
   });
 
-  const usernameError =
-    formik.touched.username && Boolean(formik.errors.username);
-
-  const passwordError =
-    formik.touched.password && Boolean(formik.errors.password);
-
   return (
     <View style={styles.flexContainer}>
       <TextInput
-        style={[styles.flexItem, usernameError && styles.errorBorder]}
+        style={styles.flexItem}
         placeholder="Username"
         placeholderTextColor="#999c9fff"
         value={formik.values.username}
         onChangeText={formik.handleChange("username")}
-        testID="usernameField"
       />
       {formik.touched.username && formik.errors.username && (
         <Text style={[{ color: "#d73a4a" }, styles.errorText]}>
@@ -103,29 +90,42 @@ const SignIn = () => {
         </Text>
       )}
       <TextInput
-        style={[styles.flexItem, passwordError && styles.errorBorder]}
+        style={styles.flexItem}
         secureTextEntry={true}
         placeholder="Password"
         placeholderTextColor="#999c9fff"
         value={formik.values.password}
         onChangeText={formik.handleChange("password")}
-        testID="passwordField"
       />
       {formik.touched.password && formik.errors.password && (
         <Text style={[{ color: "#d73a4a" }, styles.errorText]}>
           {formik.errors.password}
         </Text>
       )}
+      <TextInput
+        style={styles.flexItem}
+        secureTextEntry={true}
+        placeholder="Password confirmation"
+        placeholderTextColor="#999c9fff"
+        value={formik.values.passwordConfirmation}
+        onChangeText={formik.handleChange("passwordConfirmation")}
+      />
+      {formik.touched.passwordConfirmation &&
+        formik.errors.passwordConfirmation && (
+          <Text style={[{ color: "#d73a4a" }, styles.errorText]}>
+            {formik.errors.passwordConfirmation}
+          </Text>
+        )}
       <Pressable
         style={styles.flexButton}
         onPress={() => formik.handleSubmit()}
       >
         <Text fontWeight="bold" color="textSecondary">
-          Sign in
+          Sign up
         </Text>
       </Pressable>
     </View>
   );
 };
 
-export default SignIn;
+export default SignUp;
